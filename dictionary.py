@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+'''
+Add docstring.
+Add urlib.parse.quote()
+'''
 
 import requests, json
 from collist import collist
