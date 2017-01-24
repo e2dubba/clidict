@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
 '''
-Add docstring.
-Add urlib.parse.quote()
+This is a command line dual language dictionary. It uses the API provided by
+Glosbe to look up words in many many languages and return them in attractive
+formats at the command line. In addition, you can save the glosses and
+definitions you want to save into a csv. This can be imported then into a
+flaschcard program; notably Anki.
+The ideal way of useing this script is to create a symbolic link to this file
+using the ISO abbreviation for the language you want to look up. 
+For a list of languages see: https://glosbe.com/all-languages
+For German:
+    $ ln -s /path/to/dictionary.py /in/your/path/deu
+and call it:
+    $ deu Wort
 '''
 
 import requests, json
 from collist import collist
+import urllib
 
 
 def hyphen_range(num_string):
@@ -55,6 +66,7 @@ def querry_glosbe(lang, term):
       '&dest=eng&format=json&phrase=' + term + \
         '&pretty=true'
 
+    url = urllib.parse.quote(url)
     res = requests.get(url)
     # need to add a try statement
     json_dict = json.loads(res.text)
@@ -94,9 +106,9 @@ def user_input():
     new_defs = input('Enter Selection like:\nm:M0-Mn, Mx, My | p:P0-Pn, Px, Py\n'+\
             'l <for leo> x <for exit>\n')
     if new_defs == 'l':
-        import webbrowser
         url = 'https://dict.leo.org/ende/index_de.html#/search=' + \
                 term + '&searchLoc=0&resultOrder=basic&multiwordShowSingle=on'
+        url = urllib.parse.quote(url)
         webbrowser.open(url)
         sys.exit()
     if new_defs == 'x':
@@ -106,9 +118,10 @@ def user_input():
         return new_defs
     
 
-if __name__ == '__main__':
+def main():
     import sys
     import os 
+    import webbrowser
     lang = sys.argv[0].split('/')[-1]
     term = ' '.join(sys.argv[1:])
     file_loc = os.getenv('HOME') + '/' + lang + '.csv'
@@ -119,4 +132,8 @@ if __name__ == '__main__':
     meanings, glosses = parse_input(new_defs, meanings, glossdict) 
     new_vocab.write(term + ', ' + meanings + ', ' + glosses + '\n')
     new_vocab.close()
-    
+ 
+
+if __name__ == '__main__':
+    main()
+   
