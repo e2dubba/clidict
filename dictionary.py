@@ -17,6 +17,7 @@ and call it:
 import requests, json
 from collist import collist
 import urllib
+import sys
 
 
 def hyphen_range(num_string):
@@ -66,7 +67,7 @@ def querry_glosbe(lang, term):
       '&dest=eng&format=json&phrase=' + term + \
         '&pretty=true'
 
-    url = urllib.parse.quote(url)
+    # url = urllib.parse.quote(url)
     res = requests.get(url)
     # need to add a try statement
     json_dict = json.loads(res.text)
@@ -99,7 +100,7 @@ def for_print(meanings, phrase):
     return glossdict
 
 
-def user_input():
+def user_input(term):
     '''
     The user interface to select different translation values
     '''
@@ -119,21 +120,40 @@ def user_input():
     
 
 def main():
-    import sys
-    import os 
-    import webbrowser
-    lang = sys.argv[0].split('/')[-1]
-    term = ' '.join(sys.argv[1:])
-    file_loc = os.getenv('HOME') + '/' + lang + '.csv'
-    new_vocab = open(file_loc, 'a')
-    meanings, phrase = querry_glosbe(lang, term)
-    glossdict = for_print(meanings, phrase)
-    new_defs = user_input() 
-    meanings, glosses = parse_input(new_defs, meanings, glossdict) 
-    new_vocab.write(term + ', ' + meanings + ', ' + glosses + '\n')
-    new_vocab.close()
+    ap = argparse.ArgumentParser()
+    ap.add_argument('term', nargs='+')
+    ap.add_argument('-l', '--lang', help='specify the language to look' + \
+            'up--use iso codes')
+    ap.add_argument('-s', '--simple', help='look up a word without ' + \
+            'adding it to the csv', action='store_true')
+    a = ap.parse_args()
+    term = ' '.join(a.term)
+    if a.lang: 
+        lang = a.lang
+    else: 
+        lang = os.path.basename(sys.argv[0])
+
+    if a.simple:
+        meanings, phrase = querry_glosbe(lang, term)
+        _ = for_print(meanings, phrase)
+        sys.exit()
+    else:
+        file_dir = os.getenv('HOME') + '/.clidict/' 
+        if not os.path.exists(file_dir):
+            os.mkdir(file_dir)
+        csv_file = file_dir + lang + '.csv'
+        new_vocab = open(csv_file, 'a')
+        meanings, phrase = querry_glosbe(lang, term)
+        glossdict = for_print(meanings, phrase)
+        new_defs = user_input(term) 
+        meanings, glosses = parse_input(new_defs, meanings, glossdict) 
+        new_vocab.write(term + ', ' + meanings + ', ' + glosses + '\n')
+        new_vocab.close()
  
 
 if __name__ == '__main__':
+    import os 
+    import webbrowser
+    import argparse
     main()
    
