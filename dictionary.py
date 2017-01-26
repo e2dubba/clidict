@@ -121,6 +121,24 @@ def user_input(term):
         new_defs = new_defs.split('|')
         return new_defs
     
+
+def simple_lookup(term, lang):
+    meanings, phrase = querry_glosbe(lang, term)
+    _ = for_print(meanings, phrase)
+    sys.exit()
+    
+
+def update_hist(term, path, lang):
+    histfile = path + 'clidicthist'
+    hist = open(histfile)
+    for line in hist:
+        if line == term:
+            simple_lookup(term, lang)
+            break
+    else:
+        hist.close()
+        open(histfile, 'a').write(term + '\n')
+
 #def google_translate(term):
 
 
@@ -150,13 +168,12 @@ def main():
         lang = os.path.basename(sys.argv[0])
 
     if a.simple:
-        meanings, phrase = querry_glosbe(lang, term)
-        _ = for_print(meanings, phrase)
-        sys.exit()
+        simple_lookup(term, lang)
     else:
         file_dir = os.getenv('HOME') + '/.clidict/' 
         if not os.path.exists(file_dir):
             os.mkdir(file_dir)
+        update_hist(term, file_dir, lang)
         csv_file = file_dir + lang + '.csv'
         new_vocab = open(csv_file, 'a')
         if a.manual:
