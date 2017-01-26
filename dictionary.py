@@ -53,9 +53,11 @@ def parse_input(new_defs, meanings, phrase):
         if item[0] == 'm':
             range_list = hyphen_range(item[1])
             meanstr = '; '.join([meanings[int(i)] for i in range_list])
+            meanstr = meanstr.replace(',', ':')
         if item[0] == 'p':
             range_list = hyphen_range(item[1])
             glosstr = '; '.join([phrase[int(i)] for i in range_list])
+            glosstr = glosstr.replace(',', ':')
     return meanstr, glosstr
 
 
