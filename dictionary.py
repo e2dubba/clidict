@@ -64,10 +64,9 @@ def querry_glosbe(lang, term):
     returns a list and a set based on the json file retrieved from glosbe.com
     '''
     url = 'http://glosbe.com/gapi/translate?from=' + lang + \
-      '&dest=eng&format=json&phrase=' + term + \
+      '&dest=eng&format=json&phrase=' + urllib.parse.quote(term) + \
         '&pretty=true'
 
-    # url = urllib.parse.quote(url)
     res = requests.get(url)
     # need to add a try statement
     json_dict = json.loads(res.text)
@@ -108,8 +107,7 @@ def user_input(term):
             'l <for leo> x <for exit>\n')
     if new_defs == 'l':
         url = 'https://dict.leo.org/ende/index_de.html#/search=' + \
-                term + '&searchLoc=0&resultOrder=basic&multiwordShowSingle=on'
-        url = urllib.parse.quote(url)
+                urllib.parse.quote(term) + '&searchLoc=0&resultOrder=basic&multiwordShowSingle=on'
         webbrowser.open(url)
         sys.exit()
     if new_defs == 'x':
@@ -118,14 +116,21 @@ def user_input(term):
         new_defs = new_defs.split('|')
         return new_defs
     
+#def google_translate(term):
+
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('term', nargs='+')
     ap.add_argument('-l', '--lang', help='specify the language to look' + \
-            'up--use iso codes')
+            ' up--use iso codes')
     ap.add_argument('-s', '--simple', help='look up a word without ' + \
             'adding it to the csv', action='store_true')
+    ap.add_argument('-gT', '--googTranslate', help='return results from ' +\
+            'Google Translate', action='store_true')
+    ap.add_argument('-m' , '--manual', help='add terms manually to the ' +\
+            'csv for the specified language. Format: \'term, glosses, ' +\
+            'meaning\'', action='store_true')
     a = ap.parse_args()
     term = ' '.join(a.term)
     if a.lang: 
@@ -137,17 +142,25 @@ def main():
         meanings, phrase = querry_glosbe(lang, term)
         _ = for_print(meanings, phrase)
         sys.exit()
+    '''
+    if a.googTranslate:
+        google_translate(term)
+        sys.exit()
+    '''
     else:
         file_dir = os.getenv('HOME') + '/.clidict/' 
         if not os.path.exists(file_dir):
             os.mkdir(file_dir)
         csv_file = file_dir + lang + '.csv'
         new_vocab = open(csv_file, 'a')
+        if a.manual:
+            new_vocab.write(term + '\n')
+            sys.exit()
         meanings, phrase = querry_glosbe(lang, term)
         glossdict = for_print(meanings, phrase)
         new_defs = user_input(term) 
         meanings, glosses = parse_input(new_defs, meanings, glossdict) 
-        new_vocab.write(term + ', ' + meanings + ', ' + glosses + '\n')
+        new_vocab.write(term + ', ' + glosses + ', ' + meanings + '\n')
         new_vocab.close()
  
 
