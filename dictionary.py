@@ -130,11 +130,10 @@ def simple_lookup(term, lang):
 
 def update_hist(term, path, lang):
     histfile = path + 'clidicthist'
-    hist = open(histfile)
+    hist = open(histfile, 'r')
     for line in hist:
-        if line == term:
+        if line.strip() == term:
             simple_lookup(term, lang)
-            break
     else:
         hist.close()
         open(histfile, 'a').write(term + '\n')
