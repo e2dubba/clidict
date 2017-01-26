@@ -123,6 +123,12 @@ def user_input(term):
 
 
 def main():
+    '''
+    if a.googTranslate:
+        google_translate(term)
+        sys.exit()
+    '''
+
     ap = argparse.ArgumentParser()
     ap.add_argument('term', nargs='+')
     ap.add_argument('-l', '--lang', help='specify the language to look' + \
@@ -145,11 +151,6 @@ def main():
         meanings, phrase = querry_glosbe(lang, term)
         _ = for_print(meanings, phrase)
         sys.exit()
-    '''
-    if a.googTranslate:
-        google_translate(term)
-        sys.exit()
-    '''
     else:
         file_dir = os.getenv('HOME') + '/.clidict/' 
         if not os.path.exists(file_dir):
