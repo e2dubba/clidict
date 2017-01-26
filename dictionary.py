@@ -171,13 +171,13 @@ def main():
     else:
         file_dir = os.getenv('HOME') + '/.clidict/' 
         if not os.path.exists(file_dir):
-            os.mkdir(file_dir)
-        update_hist(term, file_dir, lang)
+            os.mkdir(file_dir) 
         csv_file = file_dir + lang + '.csv'
         new_vocab = open(csv_file, 'a')
         if a.manual:
             new_vocab.write(term + '\n')
             sys.exit()
+        update_hist(term, file_dir, lang)
         meanings, phrase = querry_glosbe(lang, term)
         glossdict = for_print(meanings, phrase)
         new_defs = user_input(term) 
