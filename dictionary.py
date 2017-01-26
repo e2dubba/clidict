@@ -112,6 +112,9 @@ def user_input(term):
         sys.exit()
     if new_defs == 'x':
         sys.exit() 
+    if new_defs == '':
+        new_defs = ['m:0', 'p:0-3']
+        return new_defs
     else: 
         new_defs = new_defs.split('|')
         return new_defs
