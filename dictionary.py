@@ -123,14 +123,26 @@ def user_input(term):
     
 
 def simple_lookup(term, lang):
+    '''
+    this function is called when the user input menu is not needed or wanted.
+    '''
     meanings, phrase = querry_glosbe(lang, term)
-    _ = for_print(meanings, phrase)
+    for_print(meanings, phrase)
     sys.exit()
     
 
 def update_hist(term, path, lang):
+    '''
+    this is a simple function to keep track of which terms have already been
+    searched for. Each new query is added to the history file. If no history
+    file exists, a new one is created.
+    '''
     histfile = path + 'clidicthist'
-    hist = open(histfile, 'r')
+    try:
+        hist = open(histfile, 'r')
+    except FileNotFoundError:
+        open(histfile, 'w').write(term + '\n')
+        return
     for line in hist:
         if line.strip() == term:
             simple_lookup(term, lang)
@@ -143,11 +155,9 @@ def update_hist(term, path, lang):
 
 def main():
     '''
-    if a.googTranslate:
-        google_translate(term)
-        sys.exit()
+    This function process the command line arguments, and controls the major
+    code flow. 
     '''
-
     ap = argparse.ArgumentParser()
     ap.add_argument('term', nargs='+')
     ap.add_argument('-l', '--lang', help='specify the language to look' + \
