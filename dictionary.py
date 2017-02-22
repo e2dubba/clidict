@@ -18,6 +18,7 @@ import requests, json
 from collist import collist
 import urllib
 import sys
+import subprocess as sp
 
 
 def hyphen_range(num_string):
@@ -52,12 +53,18 @@ def parse_input(new_defs, meanings, phrase):
         item = item.split(':')
         if item[0] == 'm':
             range_list = hyphen_range(item[1])
-            meanstr = '; '.join([meanings[int(i)] for i in range_list])
-            meanstr = meanstr.replace(',', ':')
+            try:
+                meanstr = '; '.join([meanings[int(i)] for i in range_list])
+                meanstr = meanstr.replace(',', ':')
+            except IndexError:
+                meanstr = ''
         if item[0] == 'p':
             range_list = hyphen_range(item[1])
-            glosstr = '; '.join([phrase[int(i)] for i in range_list])
-            glosstr = glosstr.replace(',', ':')
+            try:
+                glosstr = '; '.join([phrase[int(i)] for i in range_list])
+                glosstr = glosstr.replace(',', ':')
+            except IndexError:
+                glosstr = ''
     return meanstr, glosstr
 
 
