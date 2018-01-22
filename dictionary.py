@@ -19,6 +19,7 @@ from collist import collist
 import urllib
 import sys
 import subprocess as sp
+import dbusnotify
 
 
 def hyphen_range(num_string):
@@ -138,6 +139,20 @@ def simple_lookup(term, lang):
     sys.exit()
     
 
+def dbus_notify(term, lang):
+    meanings, _ = querry_glosbe(lang, term)
+    #dbusnotify.write(meanings, title=term)
+    diplymean = []
+    for i in range(0,4):
+        try:
+            diplymean.append( meanings[i])
+        except IndexError:
+            continue
+    diplymean = '\n'.join(diplymean)
+    dbusnotify.write(diplymean, title=term)
+    sys.exit()
+    
+
 def update_hist(term, path, lang):
     '''
     this is a simple function to keep track of which terms have already been
@@ -176,6 +191,8 @@ def main():
     ap.add_argument('-m' , '--manual', help='add terms manually to the ' +\
             'csv for the specified language. Format: \'term, glosses, ' +\
             'meaning\'', action='store_true')
+    ap.add_argument('-d', '--dbus', help='display definition in dbus', 
+            action='store_true')
     a = ap.parse_args()
     term = ' '.join(a.term)
     if a.lang: 
@@ -183,6 +200,8 @@ def main():
     else: 
         lang = os.path.basename(sys.argv[0])
 
+    if a.dbus:
+        dbus_notify(term, lang)
     if a.simple:
         simple_lookup(term, lang)
     else:
